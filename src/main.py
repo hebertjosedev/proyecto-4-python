@@ -77,49 +77,33 @@ def crear_libro(libro: Libro):
                  datos['books'].append(libro_nuevo)
                  with open('db.json', 'w', encoding='utf-8') as db_nueva:
                   dump(datos, db_nueva, indent=2)
-                  return JSONResponse(content={'message': 'Pelicula creada con exito'}, status_code=status.HTTP_201_CREATED)
+                  return JSONResponse(content={'message': 'Libro creado con exito'}, status_code=status.HTTP_201_CREATED)
      
     return JSONResponse(content={'message': 'Tu id de autor no pertenece a ninguno'}, status_code=status.HTTP_400_BAD_REQUEST)
 
-@app.put('/libros', tags=['libros'])
-def actualizar_libro_por_id(libro_actualizar: LibroActualizado):
-    #id_libro = str(libro_actualizar.id_libro)
+@app.put('/libros/{id_libro}', tags=['libros'])
+def actualizar_libro_por_id(id_libro:str, libro_actualizar: LibroActualizado):         
     libro_actualizado = ({
-            'id_libro': libro_actualizar.id_libro,
             'titulo': libro_actualizar.titulo,
             'autor': libro_actualizar.autor,
             'categoria': libro_actualizar.categoria,
             'year': libro_actualizar.year
         })
-    
+
     with open('db.json', 'r', encoding='utf-8') as db:
         datos = load(db)
-    longitud = len('17738d3c-9f1e-11ec-8d3d-0242ac130004')
-    print(longitud)    
-    print(libro_actualizado)
-    print(libro_actualizado['id_libro'])
-    filtrado = list(filter(lambda libro: libro['id'] == libro_actualizar.id_libro ,datos['books'])) 
-    print(filtrado)  
         
-    autores_nuevo = []
-    longitud_autores = len(autores_nuevo)
-    comparacion = []
-    longitud_comparacion = len(comparacion)
-    
-    # for autores in libro.autor:
-    #     autores_nuevo.append({'id':autores})
-    
-    # for autor_id in datos['authors']:
-    #     for autor_ingresado in autores_nuevo:
-    #         if autor_id['id'] == autor_ingresado['id']:
-    #             comparacion.append(autor_id)
-    #             if longitud_autores == longitud_comparacion:   
-    #              datos['books'].append(libro_actualizado)
-    #              with open('db.json', 'w', encoding='utf-8') as db_nueva:
-    #               dump(datos, db_nueva, indent=2)
-    #               return JSONResponse(content={'message': 'Pelicula creada con exito'}, status_code=status.HTTP_201_CREATED)
+    for libros in datos['books']:
+        if libros['id'] == id_libro:
+            libros['title'] = libro_actualizar.titulo
+            libros['category'] = libro_actualizar.categoria
+            libros['release_date'] = libro_actualizar.year
+            libros['authors'] = libro_actualizar.autor
+            with open('db.json', 'w', encoding='utf-8') as db_nueva:
+                  dump(datos, db_nueva, indent=2)
+                  return JSONResponse(content={'message': 'Libro actualizado con exito'}, status_code=status.HTTP_201_CREATED)
      
-    # return JSONResponse(content={'message': 'Tu id de autor no pertenece a ninguno'}, status_code=status.HTTP_400_BAD_REQUEST)
+    return JSONResponse(content={'message': 'No se pudo actualizar tu libro'}, status_code=status.HTTP_400_BAD_REQUEST)
 
 
 @app.delete('/libros/{id}', tags=['libros'])
